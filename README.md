@@ -6,6 +6,10 @@ Repositório de estudo prático de GitHub Actions. Cada lab isola um conceito - 
 
 Este material acompanha o curso **[GitHub Actions: Guia Completo - Do Zero ao Deploy](https://www.udemy.com/course/github-actions-guia-completo-do-zero-ao-deploy/)**, do instrutor **Ieso**, na Udemy.
 
+- [Conteúdo teórico](https://devopsautomation.com.br/udemy/github-actions-automacao/modulo-01-fundamentos/devops-intro)
+
+- [Laboratórios](https://github.com/iesodias/ghc-repo)
+
 Os labs aqui são minhas anotações e experimentações práticas em cima do conteúdo do curso, não uma cópia do material oficial. Recomendo fortemente fazer o curso original pra ter o contexto completo de cada aula.
 
 ## Como usar este repositório
