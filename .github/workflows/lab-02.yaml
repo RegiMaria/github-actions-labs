@@ -1,0 +1,52 @@
+name: "Lab 02 - Eventos de Trigger"
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - '!scripts/rascunhos/**'
+
+  # NOVO: gatilho manual com parâmetros
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: 'Ambiente de execução'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      rodar_testes:
+        description: 'Executar testes antes do ETL?'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  demonstrar-triggers:
+    name: "Demonstrar Eventos de Trigger"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Identificar o evento que disparou o workflow
+        run: |
+          echo "=== EVENTO DE TRIGGER ==="
+          echo "Nome do evento: ${{ github.event_name }}"
+          echo "Branch/ref: ${{ github.ref_name }}"
+          echo "Actor: ${{ github.actor }}"
+
+      # NOVO: só aparece quando disparado manualmente
+      - name: Mostrar inputs (apenas em execução manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "=== INPUTS RECEBIDOS ==="
+          echo "Ambiente escolhido: ${{ inputs.ambiente }}"
+          echo "Rodar testes: ${{ inputs.rodar_testes }}"
