@@ -1,3 +1,5 @@
+<p align="center"> <img src="https://github.com/user-attachments/assets/9d13006c-edef-4a9f-8b3f-e378645e018b" width="120" alt="GitHub Actions Labs"> </p>
+
 # GitHub Actions Labs
 
 Repositório de estudo prático de GitHub Actions. Cada lab isola um conceito - estrutura de workflow, jobs, variáveis, secrets, deploy - com o passo a passo documentado e o porquê de cada decisão.
@@ -24,7 +26,7 @@ Os labs aqui são minhas anotações e experimentações práticas em cima do co
 | Lab | Tópico | Workflow | Status |
 |---|---|---|---|
 | 01 | Estrutura de diretórios e arquivos, elementos obrigatórios (`name`, `on`, `jobs`), variáveis de ambiente | [`lab-01.yaml`](.github/workflows/lab-01.yaml) | ✅ |
-| 02 | *(a definir)* | — | ⬜ |
+| 02 | 	Eventos de trigger (`push` + `paths`, `workflow_dispatch` + `inputs`, `schedule/cron`), condicionais com `if`: | [`lab-02.yaml`](https://github.com/RegiMaria/github-actions-labs/blob/main/.github/workflows/lab-02.yaml) | ✅ |
 | 03 | *(a definir)* | — | ⬜ |
 | 04 | *(a definir)* | — | ⬜ |
 | 05 | *(a definir)* | — | ⬜ |
