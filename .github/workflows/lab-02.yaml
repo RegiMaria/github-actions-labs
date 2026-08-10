@@ -7,7 +7,6 @@ on:
       - 'scripts/**'
       - '!scripts/rascunhos/**'
 
-  # NOVO: gatilho manual com parâmetros
   workflow_dispatch:
     inputs:
       ambiente:
@@ -23,6 +22,10 @@ on:
         required: false
         default: true
         type: boolean
+
+  # NOVO: gatilho agendado
+  schedule:
+    - cron: '0 2 * * 1-5'   # segunda a sexta, 2h da manhã (UTC)
 
 env:
   PYTHON_VERSION: '3.12'
@@ -43,10 +46,16 @@ jobs:
           echo "Branch/ref: ${{ github.ref_name }}"
           echo "Actor: ${{ github.actor }}"
 
-      # NOVO: só aparece quando disparado manualmente
       - name: Mostrar inputs (apenas em execução manual)
         if: github.event_name == 'workflow_dispatch'
         run: |
           echo "=== INPUTS RECEBIDOS ==="
           echo "Ambiente escolhido: ${{ inputs.ambiente }}"
           echo "Rodar testes: ${{ inputs.rodar_testes }}"
+
+      # NOVO: condicional combinando os 3 eventos
+      - name: Rodar testes (condicional)
+        if: github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.rodar_testes == true)
+        run: |
+          echo "=== RODANDO TESTES ==="
+          echo "Testes executariam aqui (ex: pytest)"
