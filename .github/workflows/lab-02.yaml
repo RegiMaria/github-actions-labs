@@ -1,12 +1,20 @@
+# Nome do workflow que aparece na interface do GitHub Actions
 name: "Lab 02 - Eventos de Trigger"
 
+# Define QUANDO o workflow será executado.
+# Este lab combina 3 gatilhos diferentes no mesmo workflow.
 on:
+  # 1) Gatilho automático: dispara em push na main,
+  #    mas SÓ se o que mudou estiver dentro de scripts/
+  #    (evita rodar o pipeline à toa por causa de um README, por exemplo)
   push:
     branches: [ main ]
     paths:
       - 'scripts/**'
-      - '!scripts/rascunhos/**'
+      - '!scripts/rascunhos/**'   # ignora essa subpasta específica
 
+  # 2) Gatilho manual: permite rodar pela interface do GitHub,
+  #    escolhendo parâmetros na hora (vira um formulário no botão "Run workflow")
   workflow_dispatch:
     inputs:
       ambiente:
@@ -23,22 +31,33 @@ on:
         default: true
         type: boolean
 
-  # NOVO: gatilho agendado
+  # 3) Gatilho agendado: roda sozinho, sem precisar de push nem clique manual.
+  #    Sintaxe cron: minuto hora dia-do-mês mês dia-da-semana
   schedule:
-    - cron: '0 2 * * 1-5'   # segunda a sexta, 2h da manhã (UTC)
+    - cron: '0 2 * * 1-5'   # segunda a sexta, 2h da manhã (horário UTC)
 
+# Variáveis de ambiente globais do workflow
 env:
   PYTHON_VERSION: '3.12'
 
+# Define os trabalhos (jobs) que serão executados
 jobs:
   demonstrar-triggers:
     name: "Demonstrar Eventos de Trigger"
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Faz checkout do código do repositório
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      # Step 2: Configura o Python na versão definida em env
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Step 3: Mostra qual evento disparou essa execução e com quais dados
       - name: Identificar o evento que disparou o workflow
         run: |
           echo "=== EVENTO DE TRIGGER ==="
@@ -46,6 +65,8 @@ jobs:
           echo "Branch/ref: ${{ github.ref_name }}"
           echo "Actor: ${{ github.actor }}"
 
+      # Step 4: Só aparece o valor do input se o evento for workflow_dispatch
+      # (push e schedule não têm "inputs", então essa variável fica vazia neles)
       - name: Mostrar inputs (apenas em execução manual)
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -53,9 +74,16 @@ jobs:
           echo "Ambiente escolhido: ${{ inputs.ambiente }}"
           echo "Rodar testes: ${{ inputs.rodar_testes }}"
 
-      # NOVO: condicional combinando os 3 eventos
+      # Step 5: Demonstra um "if" condicional baseado no evento OU no input
+      # Esse padrão é muito usado: só roda teste se for PR, ou se pediram explicitamente
       - name: Rodar testes (condicional)
         if: github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.rodar_testes == true)
         run: |
           echo "=== RODANDO TESTES ==="
           echo "Testes executariam aqui (ex: pytest)"
+
+      # Step 6: Simula a execução do pipeline de ETL em si
+      - name: Executar pipeline (simulado)
+        run: |
+          echo "=== EXECUTANDO PIPELINE ==="
+          echo "Isso é onde entraria: python scripts/etl_principal.py"
