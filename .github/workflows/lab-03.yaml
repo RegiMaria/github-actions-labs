@@ -33,4 +33,29 @@ jobs:
           sleep 5   # simula um lint que demora um pouco, só pra ver o paralelismo no log
           echo "Lint finalizado em: $(date)"
 
- 
+  # ============================================
+  # JOB 2: test - roda em paralelo com o JOB 1
+  # (nenhum dos dois espera o outro, porque
+  #  nenhum tem "needs" apontando pro outro)
+  # ============================================
+  test:
+    name: "Testes"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Simular testes
+        run: |
+          echo "=== JOB: TESTES ==="
+          echo "Iniciado em: $(date)"
+          echo "Rodaria aqui: pytest -v"
+          sleep 8   # simula testes que demoram um pouco mais que o lint
+          echo "Testes finalizados em: $(date)"
+
+  
