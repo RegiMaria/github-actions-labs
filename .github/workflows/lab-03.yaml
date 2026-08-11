@@ -1,0 +1,36 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 03 - Jobs em Paralelo e Dependências (needs)"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # ============================================
+  # JOB 1: lint - roda em paralelo com o JOB 2
+  # ============================================
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Simular lint
+        run: |
+          echo "=== JOB: LINT ==="
+          echo "Iniciado em: $(date)"
+          echo "Rodaria aqui: flake8 scripts/ ou ruff check scripts/"
+          sleep 5   # simula um lint que demora um pouco, só pra ver o paralelismo no log
+          echo "Lint finalizado em: $(date)"
+
+ 
