@@ -77,4 +77,20 @@ jobs:
           echo "Só chegou aqui porque lint E test já passaram."
           echo "Rodaria aqui: python -m build"
 
-  
+  # ============================================
+  # JOB 4: notificar - roda DEPOIS do build,
+  # mas mesmo se lint ou test tiverem FALHADO
+  # (demonstra o uso de if: sempre() com needs)
+  # ============================================
+  notificar:
+    name: "Notificar resultado"
+    runs-on: ubuntu-latest
+    needs: [ lint, test, build ]
+    if: always()   # roda sempre, independente de sucesso ou falha dos anteriores
+    steps:
+      - name: Mostrar resultado de cada job anterior
+        run: |
+          echo "=== RESUMO DA EXECUÇÃO ==="
+          echo "Resultado do lint: ${{ needs.lint.result }}"
+          echo "Resultado do test: ${{ needs.test.result }}"
+          echo "Resultado do build: ${{ needs.build.result }}"
