@@ -27,3 +27,33 @@ jobs:
           echo "=== LEITURA (contents: read) ==="
           gh api repos/${{ github.repository }} --jq '.full_name, .default_branch, .visibility'
           echo "Isso funciona porque LER não exige permissão elevada."
+ 
+  # ============================================
+  # JOB 2: tenta ESCREVER (criar uma tag) sem ter
+  # permissão de escrita — isso deve FALHAR, de propósito
+  # ============================================
+  tentar-escrever-sem-permissao:
+    name: "2) Tentar criar uma tag SEM permissão de escrita"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read   # explicitamente só leitura, mesmo herdando isso do topo
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+ 
+      - name: Tentar criar tag (deve falhar com 403)
+        id: tentativa
+        continue-on-error: true   # não deixa o job todo quebrar, queremos VER o erro
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== TENTATIVA DE ESCRITA (sem contents: write) ==="
+          gh api repos/${{ github.repository }}/git/refs \
+            -f ref="refs/tags/lab04-sem-permissao-${{ github.run_number }}" \
+            -f sha="${{ github.sha }}"
+ 
+      - name: Confirmar que falhou como esperado
+        run: |
+          echo "=== RESULTADO ESPERADO ==="
+          echo "Status da tentativa: ${{ steps.tentativa.outcome }}"
+          echo "Devia ser 'failure' — prova de que contents: read não permite criar tag."
