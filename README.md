@@ -23,14 +23,15 @@ Os labs aqui são minhas anotações e experimentações práticas em cima do co
 
 ## Índice de Labs
 
+## Índice de Labs
+
 | Lab | Tópico | Workflow | Status |
 |:---:|---|:---:|:---:|
-| **01** | Estrutura de diretórios e arquivos; elementos obrigatórios (`name`, `on`, `jobs`); variáveis de ambiente | `lab-01.yaml` | ✅ |
-| **02** | Eventos de trigger (`push` + `paths`, `workflow_dispatch` + `inputs`, `schedule`/cron); condicionais com `if:` | `lab-02.yaml` | ✅ |
-| **03** | Jobs em paralelo e dependências (`needs`); `if: always()` | `lab-03.yaml` | ✅ |
-| **04** | *A definir* | — | ⬜ |
+| **01** | Estrutura de diretórios e arquivos; elementos obrigatórios (`name`, `on`, `jobs`); variáveis de ambiente | [`lab-01.yaml`](.github/workflows/lab-01.yaml) | ✅ |
+| **02** | Eventos de trigger (`push` + `paths`, `workflow_dispatch` + `inputs`, `schedule`/cron); condicionais com `if:` | [`lab-02.yaml`](.github/workflows/lab-02.yaml) | ✅ |
+| **03** | Jobs em paralelo e dependências (`needs`); `if: always()` | [`lab-03.yaml`](.github/workflows/lab-03.yaml) | ✅ |
+| **04** | Permissões e `GITHUB_TOKEN`; princípio do menor privilégio (`permissions:`) | [`lab-04.yaml`](.github/workflows/lab-04.yaml) | ✅ |
 | **05** | *A definir* | — | ⬜ |
-
 > Vou atualizando essa tabela conforme avanço nos labs. Cada linha aponta pro arquivo de workflow correspondente.
 
 ## Requisitos
