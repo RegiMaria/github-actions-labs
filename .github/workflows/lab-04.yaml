@@ -1,0 +1,29 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 04 - Permissões e GITHUB_TOKEN"
+ 
+on:
+  workflow_dispatch:   # esse lab é só manual, de propósito, pra você controlar quando testar
+ 
+# Permissão PADRÃO do workflow inteiro: apenas leitura.
+# Cada job abaixo só ganha mais do que isso se EXPLICITAMENTE declarar.
+permissions:
+  contents: read
+ 
+jobs:
+  # ============================================
+  # JOB 1: leitura - só usa o que o padrão já permite
+  # ============================================
+  leitura:
+    name: "1) Ler informações do repositório (permissão padrão)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+ 
+      - name: Ler dados do repositório via API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== LEITURA (contents: read) ==="
+          gh api repos/${{ github.repository }} --jq '.full_name, .default_branch, .visibility'
+          echo "Isso funciona porque LER não exige permissão elevada."
