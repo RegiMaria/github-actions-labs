@@ -24,3 +24,13 @@ jobs:
   demonstrar-precedencia:
     name: "1) Precedência de env (workflow -> job -> step)"
     runs-on: ubuntu-latest
+    # env no nível do JOB: sobrescreve o LOG_LEVEL do workflow,
+    # mas só dentro deste job
+    env:
+      LOG_LEVEL: "warn"
+    steps:
+      - name: Mostrar herança sem sobrescrita no step
+        run: |
+          echo "=== SEM SOBRESCRITA NO STEP ==="
+          echo "APP_NAME (vem do workflow): $APP_NAME"
+          echo "LOG_LEVEL (vem do job, sobrescreveu o workflow): $LOG_LEVEL"
