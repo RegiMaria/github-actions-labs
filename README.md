@@ -1,4 +1,6 @@
-<p align="center"> <img src="https://github.com/user-attachments/assets/9d13006c-edef-4a9f-8b3f-e378645e018b" width="120" alt="GitHub Actions Labs"> </p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9d13006c-edef-4a9f-8b3f-e378645e018b" width="120" alt="GitHub Actions Labs">
+</p>
 
 # GitHub Actions Labs
 
@@ -9,7 +11,6 @@ Repositório de estudo prático de GitHub Actions. Cada lab isola um conceito - 
 Este material acompanha o curso **[GitHub Actions: Guia Completo - Do Zero ao Deploy](https://www.udemy.com/course/github-actions-guia-completo-do-zero-ao-deploy/)**, do instrutor **Ieso**, na Udemy.
 
 - [Conteúdo teórico](https://devopsautomation.com.br/udemy/github-actions-automacao/modulo-01-fundamentos/devops-intro)
-
 - [Laboratórios](https://github.com/iesodias/ghc-repo)
 
 Os labs aqui são minhas anotações e experimentações práticas em cima do conteúdo do curso, não uma cópia do material oficial. Recomendo fortemente fazer o curso original pra ter o contexto completo de cada aula.
@@ -23,15 +24,14 @@ Os labs aqui são minhas anotações e experimentações práticas em cima do co
 
 ## Índice de Labs
 
-## Índice de Labs
-
 | Lab | Tópico | Workflow | Status |
 |:---:|---|:---:|:---:|
 | **01** | Estrutura de diretórios e arquivos; elementos obrigatórios (`name`, `on`, `jobs`); variáveis de ambiente | [`lab-01.yaml`](.github/workflows/lab-01.yaml) | ✅ |
 | **02** | Eventos de trigger (`push` + `paths`, `workflow_dispatch` + `inputs`, `schedule`/cron); condicionais com `if:` | [`lab-02.yaml`](.github/workflows/lab-02.yaml) | ✅ |
 | **03** | Jobs em paralelo e dependências (`needs`); `if: always()` | [`lab-03.yaml`](.github/workflows/lab-03.yaml) | ✅ |
 | **04** | Permissões e `GITHUB_TOKEN`; princípio do menor privilégio (`permissions:`) | [`lab-04.yaml`](.github/workflows/lab-04.yaml) | ✅ |
-| **05** | *A definir* | — | ⬜ |
+| **05** | Variáveis, `vars`, `secrets` e `Environments` (dev/homologação/produção); precedência de `env` | [`lab-05.yaml`](.github/workflows/lab-05.yaml) | ✅ |
+
 > Vou atualizando essa tabela conforme avanço nos labs. Cada linha aponta pro arquivo de workflow correspondente.
 
 ## Requisitos
@@ -42,5 +42,4 @@ Os labs aqui são minhas anotações e experimentações práticas em cima do co
 ## Créditos
 
 - Curso: [GitHub Actions: Guia Completo - Do Zero ao Deploy](https://www.udemy.com/course/github-actions-guia-completo-do-zero-ao-deploy/) - Ieso (Udemy)
-
 - Anotações e labs práticos: elaborados por mim durante o estudo do curso
