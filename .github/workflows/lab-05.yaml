@@ -34,3 +34,47 @@ jobs:
           echo "=== SEM SOBRESCRITA NO STEP ==="
           echo "APP_NAME (vem do workflow): $APP_NAME"
           echo "LOG_LEVEL (vem do job, sobrescreveu o workflow): $LOG_LEVEL"
+ 
+      - name: Mostrar sobrescrita no step
+        # env no nível do STEP: sobrescreve tudo, mas só dentro deste step
+        env:
+          APP_NAME: "nome-so-deste-step"
+        run: |
+          echo "=== COM SOBRESCRITA NO STEP ==="
+          echo "APP_NAME (sobrescrito só aqui): $APP_NAME"
+          echo "LOG_LEVEL (ainda do job, não mudou): $LOG_LEVEL"
+ 
+  usar-environment:
+    name: "2) Usar vars e secrets do Environment escolhido"
+    runs-on: ubuntu-latest
+    needs: [ demonstrar-precedencia ]
+    # Isto é o que ativa vars e secrets daquele Environment específico.
+    # O valor vem do input escolhido no momento de rodar (dev/homologacao/producao)
+    environment: ${{ inputs.ambiente }}
+    steps:
+      - name: Mostrar a var do ambiente selecionado
+        env:
+          AMBIENTE_NOME: ${{ vars.AMBIENTE_NOME }}
+        run: |
+          echo "=== VAR DO ENVIRONMENT (${{ inputs.ambiente }}) ==="
+          echo "AMBIENTE_NOME: ${AMBIENTE_NOME:-'(não configurado — crie a var no Environment)'}"
+ 
+      - name: Mapear o secret do ambiente com segurança
+        env:
+          LAB05_TOKEN: ${{ secrets.LAB05_TOKEN }}
+        run: |
+          echo "=== SECRET DO ENVIRONMENT (mascarado) ==="
+          if [ -z "$LAB05_TOKEN" ]; then
+            echo "LAB05_TOKEN não configurado neste Environment ainda."
+          else
+            echo "Token recebido com sucesso (o valor real nunca aparece aqui)."
+            echo "Ele seria usado assim: curl -H \"Authorization: Bearer \$LAB05_TOKEN\" https://api.exemplo.com"
+          fi
+ 
+      - name: Condicional usando vars (não secrets) para decidir comportamento
+        if: ${{ inputs.ambiente == 'producao' }}
+        run: |
+          echo "=== ATENÇÃO ==="
+          echo "Este step só roda quando o ambiente escolhido é produção."
+          echo "Se o Environment 'producao' tiver 'Required reviewers' configurado,"
+          echo "o job inteiro ficou pausado ANTES de chegar até aqui, esperando aprovação."
