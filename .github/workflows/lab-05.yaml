@@ -1,0 +1,15 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 05 - Variaveis, Secrets e Environments"
+ 
+on:
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: 'Ambiente a usar neste run'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - homologacao
+          - producao
