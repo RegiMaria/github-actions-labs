@@ -13,3 +13,14 @@ on:
           - dev
           - homologacao
           - producao
+ 
+# env no nível do WORKFLOW: vale como padrão pra todos os jobs,
+# a menos que algo mais específico sobrescreva
+env:
+  APP_NAME: "lab-05-demo"
+  LOG_LEVEL: "info"
+ 
+jobs:
+  demonstrar-precedencia:
+    name: "1) Precedência de env (workflow -> job -> step)"
+    runs-on: ubuntu-latest
