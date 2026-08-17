@@ -46,3 +46,22 @@ jobs:
  
       - name: Confirmar a versão instalada de fato
         run: python --version
+ 
+      # Produzindo uma SAÍDA de step (novidade deste lab).
+      # O "id" é obrigatório para depois conseguirmos ler steps.<id>.outputs
+      - id: checar-versao
+        name: Verificar se é a versão mais nova do matrix (produz output)
+        run: |
+          echo "=== CONTEXTO: steps (produzindo) ==="
+          if [ "${{ matrix.python-version }}" = "3.12" ]; then
+            echo "resultado=mais-recente" >> "$GITHUB_OUTPUT"
+          else
+            echo "resultado=antiga" >> "$GITHUB_OUTPUT"
+          fi
+ 
+      # Consumindo a saída do step anterior, no MESMO job
+      - name: Reagir de acordo com a saída do step anterior
+        if: ${{ steps.checar-versao.outputs.resultado == 'mais-recente' }}
+        run: |
+          echo "=== CONTEXTO: steps (consumindo) ==="
+          echo "Esta é a versão mais recente do Python testada neste lab."
