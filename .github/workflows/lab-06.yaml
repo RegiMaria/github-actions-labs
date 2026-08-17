@@ -1,22 +1,22 @@
 # Nome do workflow que aparece na interface do GitHub Actions
 name: "Lab 06 - Contextos e Expressoes"
- 
+
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
- 
+
 jobs:
   info:
     name: "Testar em várias versões de Python (matrix)"
     runs-on: ubuntu-latest
- 
+
     # strategy.matrix roda este job UMA VEZ PRA CADA combinação listada.
     # Aqui, 3 versões de Python = 3 execuções paralelas deste mesmo job.
     strategy:
       matrix:
         python-version: [ "3.10", "3.11", "3.12" ]
- 
+
     steps:
       # Contexto GITHUB: metadados do evento que disparou o workflow
       - name: Exibir metadados do evento (contexto github)
@@ -25,28 +25,28 @@ jobs:
           echo "Evento: ${{ github.event_name }}"
           echo "Branch/Ref: ${{ github.ref }}"
           echo "Actor: ${{ github.actor }}"
- 
+
       # Contexto RUNNER: informações sobre a máquina que está executando
       - name: Exibir sistema operacional (contexto runner)
         run: |
           echo "=== CONTEXTO: runner ==="
           echo "Sistema operacional: ${{ runner.os }}"
           echo "Arquitetura: ${{ runner.arch }}"
- 
+
       # Contexto MATRIX: qual combinação está ativa NESTA execução específica
       - name: Exibir versão de Python desta execução (contexto matrix)
         run: |
           echo "=== CONTEXTO: matrix ==="
           echo "Versão de Python desta execução: ${{ matrix.python-version }}"
- 
+
       - name: Configurar Python (usando o valor vindo do matrix)
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
- 
+
       - name: Confirmar a versão instalada de fato
         run: python --version
- 
+
       # Produzindo uma SAÍDA de step (novidade deste lab).
       # O "id" é obrigatório para depois conseguirmos ler steps.<id>.outputs
       - id: checar-versao
@@ -58,10 +58,19 @@ jobs:
           else
             echo "resultado=antiga" >> "$GITHUB_OUTPUT"
           fi
- 
+
       # Consumindo a saída do step anterior, no MESMO job
       - name: Reagir de acordo com a saída do step anterior
         if: ${{ steps.checar-versao.outputs.resultado == 'mais-recente' }}
         run: |
           echo "=== CONTEXTO: steps (consumindo) ==="
           echo "Esta é a versão mais recente do Python testada neste lab."
+
+      # EXPRESSÃO com função: toJSON transforma um contexto em texto,
+      # útil pra depurar sem imprimir nada sensível
+      - name: Depurar o contexto matrix inteiro em JSON
+        run: |
+          echo "=== FUNÇÃO: toJSON(matrix) ==="
+          echo '${{ toJSON(matrix) }}'
+
+      
