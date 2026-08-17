@@ -38,3 +38,11 @@ jobs:
         run: |
           echo "=== CONTEXTO: matrix ==="
           echo "Versão de Python desta execução: ${{ matrix.python-version }}"
+ 
+      - name: Configurar Python (usando o valor vindo do matrix)
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+ 
+      - name: Confirmar a versão instalada de fato
+        run: python --version
