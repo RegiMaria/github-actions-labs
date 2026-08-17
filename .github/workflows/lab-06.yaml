@@ -73,4 +73,11 @@ jobs:
           echo "=== FUNÇÃO: toJSON(matrix) ==="
           echo '${{ toJSON(matrix) }}'
 
-      
+      # EXPRESSÃO com função: hashFiles gera um hash determinístico de arquivos,
+      # muito usado como chave de cache de dependências
+      - name: Gerar hash do requirements.txt (útil para cache)
+        run: |
+          echo "=== FUNÇÃO: hashFiles ==="
+          echo "Hash: ${{ hashFiles('**/requirements*.txt') }}"
+          echo "(seria usado como chave em actions/cache, pra só reinstalar"
+          echo "dependências quando o requirements.txt realmente mudar)"
