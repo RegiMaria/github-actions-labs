@@ -1,0 +1,29 @@
+name: "Lab 06 - Contextos e Expressoes"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  info:
+    name: "Testar em várias versões de Python (matrix)"
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [ "3.10", "3.11", "3.12" ]
+
+    steps:
+      - name: Exibir metadados do evento (contexto github)
+        run: |
+          echo "=== CONTEXTO: github ==="
+          echo "Evento: ${{ github.event_name }}"
+          echo "Branch/Ref: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+
+      - name: Exibir sistema operacional (contexto runner)
+        run: |
+          echo "=== CONTEXTO: runner ==="
+          echo "Sistema operacional: ${{ runner.os }}"
+          echo "Arquitetura: ${{ runner.arch }}"
