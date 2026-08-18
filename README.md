@@ -31,6 +31,7 @@ Os labs aqui são minhas anotações e experimentações práticas em cima do co
 | **03** | Jobs em paralelo e dependências (`needs`); `if: always()` | [`lab-03.yaml`](.github/workflows/lab-03.yaml) | ✅ |
 | **04** | Permissões e `GITHUB_TOKEN`; princípio do menor privilégio (`permissions:`) | [`lab-04.yaml`](.github/workflows/lab-04.yaml) | ✅ |
 | **05** | Variáveis, `vars`, `secrets` e `Environments` (dev/homologação/produção); precedência de `env` | [`lab-05.yaml`](.github/workflows/lab-05.yaml) | ✅ |
+| **06** | Contextos e expressões (`github`, `runner`, `steps.outputs`, `matrix`); funções `toJSON`/`hashFiles` | [`lab-06.yaml`](.github/workflows/lab-06.yaml) | ✅ |
 
 > Vou atualizando essa tabela conforme avanço nos labs. Cada linha aponta pro arquivo de workflow correspondente.
 
