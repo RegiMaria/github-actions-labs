@@ -1,0 +1,75 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 07 - Environments e Protecoes de Implantacao"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: 'Ambiente de destino do deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - homologacao
+          - producao
+
+jobs:
+  # ============================================
+  # JOB 1: build/test - NÃO tem environment.
+  # Não precisa (nem deve) ter acesso a segredos
+  # de nenhum ambiente específico.
+  # ============================================
+  build:
+    name: "1) Build e testes (sem environment)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Simular build e testes
+        run: |
+          echo "=== BUILD/TEST (sem acesso a segredos de ambiente) ==="
+          echo "Rodaria aqui: pytest, flake8, python -m build"
+          echo "Este job passa antes de qualquer deploy ser considerado."
+
+  # ============================================
+  # JOB 2: deploy - SÓ este job declara environment,
+  # com name + url (novidade deste lab)
+  # ============================================
+  deploy:
+    name: "2) Deploy"
+    runs-on: ubuntu-latest
+    needs: [ build ]   # só roda depois que build/test passar
+    environment:
+      name: ${{ inputs.ambiente }}
+      # a URL pode ser dinâmica, mudando conforme o ambiente escolhido
+      url: https://minha-app-${{ inputs.ambiente }}.exemplo.com
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Mostrar o ambiente e a var associada
+        env:
+          AMBIENTE_NOME: ${{ vars.AMBIENTE_NOME }}
+        run: |
+          echo "=== DEPLOY PARA: ${{ inputs.ambiente }} ==="
+          echo "Nome amigável (var do environment): ${AMBIENTE_NOME:-'(não configurado)'}"
+
+      - name: Usar o secret do environment com segurança
+        env:
+          LAB05_TOKEN: ${{ secrets.LAB05_TOKEN }}
+        run: |
+          echo "=== USANDO SECRET DO AMBIENTE ==="
+          if [ -z "$LAB05_TOKEN" ]; then
+            echo "Nenhum token configurado neste environment ainda."
+          else
+            echo "Token disponível (valor mascarado). Deploy usaria isso pra autenticar."
+          fi
+
+      - name: Finalizar deploy
+        run: |
+          echo "=== DEPLOY CONCLUÍDO ==="
+          echo "Branch: ${GITHUB_REF_NAME:-desconhecida}"
+          echo "A URL configurada no environment aparece no resumo desta execução,"
+          echo "como link clicável, no topo da página do workflow run."
