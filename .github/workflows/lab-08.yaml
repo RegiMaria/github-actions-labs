@@ -1,0 +1,65 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 08 - Matriz e Concorrencia"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+# CONCORRÊNCIA: agrupa execuções por workflow + branch.
+# Se você der outro push antes desta execução terminar,
+# a execução anterior deste MESMO grupo é cancelada automaticamente.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testar-combinacoes:
+    name: "Testar em várias combinações"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # fail-fast: false -> mesmo se uma combinação falhar,
+      # as outras continuam até o fim (não cancela em cascata)
+      fail-fast: false
+
+      # max-parallel: 2 -> no máximo 2 combinações rodando ao mesmo tempo,
+      # mesmo que a matriz tenha mais de 2 combinações no total
+      max-parallel: 2
+
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        python-version: [ "3.11", "3.12" ]
+        # Isso gera 2 x 2 = 4 combinações no total:
+        # (ubuntu, 3.11), (ubuntu, 3.12), (windows, 3.11), (windows, 3.12)
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Exibir a combinação desta execução
+        run: |
+          echo "=== COMBINAÇÃO ATIVA ==="
+          echo "Sistema operacional: ${{ matrix.os }}"
+          echo "Versão de Python: ${{ matrix.python-version }}"
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Confirmar versão instalada
+        run: python --version
+
+      # Este step FALHA de propósito em uma única combinação
+      # (windows + 3.11), só pra você observar o efeito do fail-fast: false
+      # nas outras 3 combinações, que devem continuar rodando normalmente.
+      - name: Simular uma falha isolada (só numa combinação)
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ] && [ "${{ matrix.python-version }}" = "3.11" ]; then
+            echo "Forçando falha de propósito nesta combinação específica"
+            exit 1
+          else
+            echo "Esta combinação passa normalmente"
+          fi
