@@ -1,0 +1,99 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 09 - Artefatos e Cache"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # ============================================
+  # JOB 1: build - usa CACHE (acelera instalação)
+  # e gera um ARTEFATO (relatório) pro próximo job
+  # ============================================
+  build:
+    name: "1) Build (com cache) e gerar relatório"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # CACHE: guarda o diretório de dependências do pip.
+      # A "key" usa o hash do requirements.txt — se o arquivo
+      # não mudar, a mesma chave é encontrada e reaproveitada.
+      - name: Cache de dependências pip
+        id: cache-pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Mostrar se o cache foi encontrado (cache hit ou miss)
+        run: |
+          echo "=== RESULTADO DO CACHE ==="
+          echo "Cache encontrado (hit): ${{ steps.cache-pip.outputs.cache-hit }}"
+          echo "Se for 'true', o pip reaproveitou pacotes já baixados antes."
+          echo "Se vazio/'false', foi um cache miss — baixou tudo do zero."
+
+      - name: Instalar dependências (mais rápido se o cache bateu)
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "Nenhum requirements.txt encontrado, pulando instalação real."
+          fi
+
+      # Gera um arquivo qualquer, simulando um relatório de build/teste
+      - name: Gerar relatório
+        run: |
+          echo "=== GERANDO RELATÓRIO ==="
+          mkdir -p relatorio
+          echo "Relatório de build - $(date)" > relatorio/build-report.txt
+          echo "Executado por: ${{ github.actor }}" >> relatorio/build-report.txt
+          echo "Commit: ${{ github.sha }}" >> relatorio/build-report.txt
+          cat relatorio/build-report.txt
+
+      # ARTEFATO: sobe o arquivo pro storage do Actions,
+      # disponível pra outros jobs (via download) ou pra você baixar manualmente
+      - name: Upload do relatório como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-report
+          path: relatorio/build-report.txt
+          retention-days: 7   # expira sozinho depois de 7 dias
+
+  # ============================================
+  # JOB 2: usar-artefato - roda em um RUNNER DIFERENTE,
+  # isolado do Job 1. Só consegue ver o relatório
+  # porque foi baixado explicitamente via download-artifact.
+  # ============================================
+  usar-artefato:
+    name: "2) Consumir o artefato em outro job"
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - name: Tentar ler o relatório SEM baixar (prova que cache/artefato não é automático)
+        run: |
+          echo "=== ANTES DO DOWNLOAD ==="
+          echo "Este job roda numa máquina totalmente separada do Job 1."
+          echo "Nada do que o Job 1 criou existe aqui automaticamente."
+          ls -la . || true
+
+      - name: Download do artefato gerado pelo Job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: build-report
+          path: relatorio-baixado
+
+      - name: Ler o relatório baixado
+        run: |
+          echo "=== DEPOIS DO DOWNLOAD ==="
+          cat relatorio-baixado/build-report.txt
+          echo ""
+          echo "Isso só funcionou por causa do upload-artifact/download-artifact."
+          echo "Cache NÃO teria feito isso — cache é isolado por job."
