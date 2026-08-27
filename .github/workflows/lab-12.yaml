@@ -1,0 +1,64 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+#
+# ATENÇÃO: este lab é a CONTINUAÇÃO do Lab 11. O Lab 11 foi mantido
+# intacto de propósito (com o import não usado), como prova histórica
+# de que o lint pegou um erro real. Este lab (12) mostra o mesmo fluxo
+# já CORRIGIDO, usando um script novo — sem apagar nem alterar nada do Lab 11.
+name: "Lab 12 - Lint Real com Ruff (apos correcao)"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/etl_exemplo_corrigido.py'
+      - 'requirements-dev.txt'
+
+jobs:
+  lint:
+    name: "Rodar Ruff no código já corrigido"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache de dependências pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements-dev.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Instalar dependências de desenvolvimento
+        run: pip install -r requirements-dev.txt
+
+      - name: Registrar o problem matcher do Ruff
+        run: echo "::add-matcher::.github/problem-matchers/ruff.json"
+
+      # DIFERENÇA importante em relação ao Lab 11:
+      # aqui NÃO usamos continue-on-error. Agora que o código está
+      # correto, queremos que o job reflita o resultado real do lint —
+      # se algum dia alguém quebrar isso de novo, o job deve falhar de verdade.
+      - name: Rodar Ruff (sem continue-on-error, comportamento real de CI)
+        id: ruff
+        run: ruff check --output-format=concise scripts/etl_exemplo_corrigido.py
+
+      - name: Remover o problem matcher
+        run: echo "::remove-matcher owner=ruff-lab10::"
+
+      - name: Gerar resumo do resultado
+        if: always()   # roda mesmo se o step do ruff tiver falhado
+        run: |
+          echo "# Resultado do Lint (Lab 12 - pós-correção)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Valor |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Resultado do Ruff | ${{ steps.ruff.outcome }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Arquivo analisado | scripts/etl_exemplo_corrigido.py |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Comparação | Lab 11 = failure (com problema) / Lab 12 = success (corrigido) |" >> "$GITHUB_STEP_SUMMARY"
