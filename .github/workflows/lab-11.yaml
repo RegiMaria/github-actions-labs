@@ -1,0 +1,68 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 11 - Lint Real com Ruff e Problem Matcher"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/**'
+      - 'requirements-dev.txt'
+
+jobs:
+  lint:
+    name: "Rodar Ruff de verdade com anotações"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache de dependências pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements-dev.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Instalar dependências de desenvolvimento
+        run: pip install -r requirements-dev.txt
+
+      - name: Registrar o problem matcher do Ruff
+        run: echo "::add-matcher::.github/problem-matchers/ruff.json"
+
+      # IMPORTANTE: o Ruff, por padrão, usa um formato de saída "bonito"
+      # (multi-linha), que NÃO bate com o problem matcher.
+      # --output-format=concise força o formato "arquivo:linha:coluna: código mensagem",
+      # que é o que o matcher (e o antigo padrão do flake8) reconhece.
+      #
+      # continue-on-error: true aqui é de propósito, só pra este lab não
+      # falhar o workflow inteiro — em um projeto real, você QUER que
+      # o job falhe se o lint encontrar problema.
+      - name: Rodar Ruff de verdade
+        id: ruff
+        continue-on-error: true
+        run: ruff check --output-format=concise scripts/
+
+      - name: Remover o problem matcher
+        run: echo "::remove-matcher owner=ruff-lab10::"
+
+      - name: Gerar resumo do resultado
+        run: |
+          echo "# Resultado do Lint (Lab 11)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Valor |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Resultado do Ruff | ${{ steps.ruff.outcome }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Arquivo analisado | scripts/etl_exemplo.py |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Falhar o job se o lint encontrou problema (comportamento real)
+        if: steps.ruff.outcome == 'failure'
+        run: |
+          echo "Em um projeto real, este step faria o job falhar de verdade."
+          echo "Aqui só avisamos, pra você poder ver as anotações sem o job todo ficar vermelho."
