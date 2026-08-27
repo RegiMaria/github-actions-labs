@@ -1,0 +1,51 @@
+# Nome do workflow que aparece na interface do GitHub Actions
+name: "Lab 10 - Logs, Debug e Problem Matchers"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  demo:
+    name: "Demonstrar Step Summary e Problem Matcher"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # STEP SUMMARY: qualquer markdown escrito aqui aparece
+      # como um painel visual na página da execução
+      - name: Gerar resumo do job (Step Summary)
+        run: |
+          echo "# Resultado do Lab 10" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Valor |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Executado por | ${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | ${{ github.ref_name }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | ${{ github.sha }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Status do lint (simulado) | 1 problema encontrado |" >> "$GITHUB_STEP_SUMMARY"
+
+      # PROBLEM MATCHER: registra o padrão ANTES de rodar
+      # a ferramenta que vai gerar as linhas de log a serem casadas
+      - name: Registrar o problem matcher do Ruff
+        run: echo "::add-matcher::.github/problem-matchers/ruff.json"
+
+      # Simula uma saída de lint com um "erro" de propósito,
+      # no formato EXATO que o Ruff de verdade produz:
+      # arquivo:linha:coluna: código mensagem
+      - name: Simular saída de lint com um problema (ruff fake)
+        run: |
+          echo "=== SIMULANDO LINT (ruff check) ==="
+          echo "scripts/etl_principal.py:12:1: F401 [*] \`os\` imported but unused"
+          echo "Isso é uma simulação — não é um erro de verdade neste lab."
+
+      # Boa prática: remover o matcher no final,
+      # pra ele não continuar ativo em steps seguintes que não têm nada a ver
+      - name: Remover o problem matcher
+        run: echo "::remove-matcher owner=ruff-lab10::"
+
+      - name: Finalizar
+        run: |
+          echo "=== FIM DO LAB ==="
+          echo "Veja o resumo (Step Summary) na página desta execução."
+          echo "Veja a anotação gerada pelo problem matcher, se aparecer no topo do log."
