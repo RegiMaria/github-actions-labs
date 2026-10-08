@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/9d13006c-edef-4a9f-8b3f-e378645e018b" width="120" alt="GitHub Actions Labs">
+  <img src="https://github.com/user-attachments/assets/2c7486ed-2ccc-4992-a8ac-855104a1a34a"  width="900" alt="GitHub Actions Labs">
 </p>
 
 # GitHub Actions Labs
@@ -44,3 +44,6 @@ Os labs aqui são minhas anotações e experimentações práticas em cima do co
 
 - Curso: [GitHub Actions: Guia Completo - Do Zero ao Deploy](https://www.udemy.com/course/github-actions-guia-completo-do-zero-ao-deploy/) - Ieso (Udemy)
 - Anotações e labs práticos: elaborados por mim durante o estudo do curso
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9d13006c-edef-4a9f-8b3f-e378645e018b" width="120" alt="GitHub Actions Labs">
+</p>
